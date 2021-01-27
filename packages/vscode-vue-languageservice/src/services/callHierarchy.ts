@@ -9,16 +9,15 @@ import { TextDocument } from 'vscode-languageserver-textdocument';
 import { SourceFile } from '../sourceFiles';
 import type * as ts2 from '@volar/vscode-typescript-languageservice';
 import { notEmpty, uriToFsPath } from '@volar/shared';
-import { duplicateLocations, duplicateCallHierarchyIncomingCall, duplicateCallHierarchyOutgoingCall } from '../utils/commons';
 import * as upath from 'upath';
+import * as dedupe from '../utils/dedupe';
 
 export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService: ts2.LanguageService) {
 	function prepareCallHierarchy(document: TextDocument, position: Position) {
 		let vueItems: CallHierarchyItem[] = [];
 
 		if (document.languageId !== 'vue') {
-			const items = worker(document.uri, position);
-			vueItems = vueItems.concat(items);
+			vueItems = worker(document.uri, position);
 		}
 		else {
 			const sourceFile = sourceFiles.get(document.uri);
@@ -40,7 +39,7 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 			};
 		}
 
-		return duplicateLocations(vueItems);
+		return dedupe.withLocations(vueItems);
 	}
 	function provideCallHierarchyIncomingCalls(item: CallHierarchyItem) {
 		const tsItems = tsTsCallHierarchyItem(item);
@@ -55,7 +54,7 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 				fromRanges: vueRanges,
 			});
 		}
-		return duplicateCallHierarchyIncomingCall(vueIncomingItems);
+		return dedupe.withCallHierarchyIncomingCalls(vueIncomingItems);
 	}
 	function provideCallHierarchyOutgoingCalls(item: CallHierarchyItem) {
 		const tsItems = tsTsCallHierarchyItem(item);
@@ -70,7 +69,7 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 				fromRanges: vueRanges,
 			});
 		}
-		return duplicateCallHierarchyOutgoingCall(vueIncomingItems);
+		return dedupe.withCallHierarchyOutgoingCalls(vueIncomingItems);
 	}
 
 	return {

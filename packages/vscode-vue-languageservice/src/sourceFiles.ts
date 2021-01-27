@@ -24,8 +24,8 @@ import { useScriptMain } from './virtuals/main';
 import { useTemplateRaw } from './virtuals/template.raw';
 import { useTemplateScript } from './virtuals/template';
 import { useStylesRaw } from './virtuals/styles.raw';
-import { duplicateDiagnostics } from './utils/commons';
 import * as htmlparser2 from 'htmlparser2';
+import * as dedupe from './utils/dedupe';
 
 export type SourceFile = ReturnType<typeof createSourceFile>;
 
@@ -495,7 +495,7 @@ export function createSourceFile(initialDocument: TextDocument, tsLanguageServic
 				diag[1] = diag[0].value;
 				diag[2] = Date.now() - startTime;
 				const results = [...all, ...keep].map(diag => diag[1]).flat();
-				response(duplicateDiagnostics(results));
+				response(dedupe.withDiagnostics(results));
 			}
 		}
 

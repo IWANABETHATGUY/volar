@@ -8,7 +8,7 @@ import * as jsonc from 'jsonc-parser';
 import { uriToFsPath, fsPathToUri } from '@volar/shared';
 import * as upath from 'upath';
 import type * as ts from 'typescript';
-import { notEmpty } from '../utils/commons';
+import { notEmpty } from '@volar/shared';
 import * as globalServices from '../globalServices';
 import { getTypescript } from '@volar/vscode-builtin-packages';
 

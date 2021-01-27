@@ -26,15 +26,14 @@ export async function activate(context: vscode.ExtensionContext) {
 	preview.activate(context);
 	callGraph.activate(context, apiClient);
 	showReferences.activate(context, apiClient);
-	documentVersion.activate(context, docClient);
 	formatAll.activate(context, apiClient);
+	documentVersion.activate(context, docClient);
 	verifyAll.activate(context, docClient);
 	virtualFiles.activate(context, docClient);
-	tagClosing.activate(context, htmlClient);
 	semanticTokens.activate(context, docClient);
+	tagClosing.activate(context, htmlClient);
 	restart.activate(context, [apiClient, docClient]);
 
-	// TODO: active by vue block lang
 	startEmbeddedLanguageServices();
 }
 
@@ -43,15 +42,10 @@ export function deactivate(): Thenable<void> | undefined {
 }
 
 function createLanguageService(context: vscode.ExtensionContext, mode: string, name: string, port: number, fileOnly: boolean) {
-	// The server is implemented in node
-	let serverModule = context.asAbsolutePath(path.join('node_modules', '@volar', 'server', 'out', 'server.js'));
-	// The debug options for the server
-	// --inspect=6009: runs the server in Node's Inspector mode so VS Code can attach to the server for debugging
-	let debugOptions = { execArgv: ['--nolazy', '--inspect=' + port] };
 
-	// If the extension is launched in debug mode then the debug server options are used
-	// Otherwise the run options are used
-	let serverOptions: lsp.ServerOptions = {
+	const serverModule = context.asAbsolutePath(path.join('node_modules', '@volar', 'server', 'out', 'server.js'));
+	const debugOptions = { execArgv: ['--nolazy', '--inspect=' + port] };
+	const serverOptions: lsp.ServerOptions = {
 		run: { module: serverModule, transport: lsp.TransportKind.ipc },
 		debug: {
 			module: serverModule,
@@ -59,10 +53,7 @@ function createLanguageService(context: vscode.ExtensionContext, mode: string, n
 			options: debugOptions
 		},
 	};
-
-	// Options to control the language client
-	let clientOptions: lsp.LanguageClientOptions = {
-		// Register the server for plain text documents
+	const clientOptions: lsp.LanguageClientOptions = {
 		documentSelector: fileOnly ?
 			[
 				{ scheme: 'file', language: 'vue' },
@@ -77,29 +68,22 @@ function createLanguageService(context: vscode.ExtensionContext, mode: string, n
 				{ language: 'javascriptreact' },
 				{ language: 'typescriptreact' },
 			],
-		synchronize: {
-			// Notify the server about file changes to '.clientrc files contained in the workspace
-			fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
-		},
 		initializationOptions: {
 			appRoot: vscode.env.appRoot,
 			mode: mode,
 		},
 	};
-
-	// Create the language client and start the client.
 	const client = new lsp.LanguageClient(
 		name,
 		serverOptions,
 		clientOptions,
 	);
-
-	// Start the client. This will also launch the server
-	client.start();
+	context.subscriptions.push(client.start());
 
 	return client;
 }
 async function startEmbeddedLanguageServices() {
+
 	const ts = vscode.extensions.getExtension('vscode.typescript-language-features');
 	const css = vscode.extensions.getExtension('vscode.css-language-features');
 	const html = vscode.extensions.getExtension('vscode.html-language-features');

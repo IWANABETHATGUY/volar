@@ -7,12 +7,12 @@ import {
 import { SourceFile } from '../sourceFiles';
 import {
 	tsLocationToVueLocations,
-	duplicateLocations,
 	findSourceFileByTsUri,
 } from '../utils/commons';
 import type * as ts2 from '@volar/vscode-typescript-languageservice';
 import * as globalServices from '../globalServices';
 import { TsMappingData, TsSourceMap } from '../utils/sourceMaps';
+import * as dedupe from '../utils/dedupe';
 
 export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService: ts2.LanguageService, getGlobalTsSourceMaps?: () => Map<string, { sourceMap: TsSourceMap }>) {
 	return (document: TextDocument, position: Position, ingoreTsResult = false) => {
@@ -23,7 +23,7 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 			if (ingoreTsResult) {
 				result = result.filter(loc => sourceFiles.has(loc.uri)); // duplicate
 			}
-			return duplicateLocations(result);
+			return dedupe.withLocations(result);
 		}
 
 		const sourceFile = sourceFiles.get(document.uri);
@@ -32,7 +32,7 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 		const tsResult = getTsResult(sourceFile);
 		const cssResult = getCssResult(sourceFile);
 		const result = [...tsResult, ...cssResult];
-		return duplicateLocations(result);
+		return dedupe.withLocations(result);
 
 		function getTsResult(sourceFile: SourceFile) {
 			let result: Location[] = [];
