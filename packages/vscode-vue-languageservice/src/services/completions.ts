@@ -65,14 +65,14 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 			for (const sourceMap of sourceFile.getTsSourceMaps()) {
 				const virtualLocs = sourceMap.sourceToTargets(range);
 				for (const virtualLoc of virtualLocs) {
-					if (!virtualLoc.maped.data.capabilities.completion) continue;
-					const quotePreference = virtualLoc.maped.data.vueTag === 'template' ? 'single' : 'auto';
+					if (!virtualLoc.data.capabilities.completion) continue;
+					const quotePreference = virtualLoc.data.vueTag === 'template' ? 'single' : 'auto';
 					let tsItems = tsLanguageService.doComplete(sourceMap.targetDocument.uri, virtualLoc.range.start, {
 						quotePreference,
-						includeCompletionsForModuleExports: ['script', 'scriptSetup'].includes(virtualLoc.maped.data.vueTag ?? ''), // TODO: read ts config
+						includeCompletionsForModuleExports: ['script', 'scriptSetup'].includes(virtualLoc.data.vueTag ?? ''), // TODO: read ts config
 						triggerCharacter: context?.triggerCharacter as ts.CompletionsTriggerCharacter,
 					});
-					if (virtualLoc.maped.data.vueTag === 'template') {
+					if (virtualLoc.data.vueTag === 'template') {
 						tsItems = tsItems.filter(tsItem => {
 							const sortText = Number(tsItem.sortText);
 							if (Number.isNaN(sortText))

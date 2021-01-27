@@ -34,7 +34,7 @@ export function register(sourceFiles: Map<string, SourceFile>) {
 			for (const sourceMap of sourceFile.getTsSourceMaps()) {
 				const virtualLocs = sourceMap.sourceToTargets(range);
 				for (const virtualLoc of virtualLocs) {
-					if (!virtualLoc.maped.data.capabilities.formatting) continue;
+					if (!virtualLoc.data.capabilities.formatting) continue;
 					return {
 						sourceMap,
 						document: sourceMap.targetDocument,

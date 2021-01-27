@@ -184,7 +184,7 @@ function toVueFoldingRangesTs(virtualFoldingRanges: FoldingRange[], sourceMap: T
 			start: { line: foldingRange.startLine, character: foldingRange.startCharacter ?? 0 },
 			end: { line: foldingRange.endLine, character: foldingRange.endCharacter ?? 0 },
 		});
-		if (vueLoc && vueLoc.maped.data.capabilities.foldingRanges) {
+		if (vueLoc && vueLoc.data.capabilities.foldingRanges) {
 			foldingRange.startLine = vueLoc.range.start.line;
 			foldingRange.endLine = vueLoc.range.end.line;
 			if (foldingRange.startCharacter !== undefined)

@@ -77,7 +77,7 @@ export function tsLocationToVueLocationsRaw(location: Location, sourceFiles: Map
 		const vueLocs = sourceMap.targetToSources(location.range);
 		for (const vueLoc of vueLocs) {
 			const sourceLocation = Location.create(sourceMap.sourceDocument.uri, vueLoc.range)
-			result.push([sourceLocation, vueLoc.maped.data]);
+			result.push([sourceLocation, vueLoc.data]);
 		}
 	}
 

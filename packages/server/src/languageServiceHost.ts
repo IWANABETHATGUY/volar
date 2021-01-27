@@ -68,7 +68,7 @@ export function createLanguageServiceHost(
 		for (const tsConfig of [...languageServices.keys()]) {
 			onTsConfigChanged(tsConfig);
 		}
-		for (const [tsConfig, service] of languageServices) {
+		for (const [_, service] of languageServices) {
 			service.onProjectFilesUpdate([]);
 		}
 	}
@@ -363,7 +363,7 @@ export function createLanguageServiceHost(
 		}
 		function dispose() {
 			disposed = true;
-			for (const [uri, fileWatcher] of fileWatchers) {
+			for (const [_, fileWatcher] of fileWatchers) {
 				fileWatcher.close();
 			}
 			directoryWatcher.close();

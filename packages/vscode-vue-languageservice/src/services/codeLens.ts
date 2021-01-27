@@ -82,7 +82,7 @@ export function register(sourceFiles: Map<string, SourceFile>, getGlobalTsSource
 						end: document.positionAt(descriptor.scriptSetup.loc.end),
 					},
 					command: {
-						title: 'ref sugar ' + (data.data.labels.length ? '☑' : '☐'),
+						title: 'ref sugar ' + (data.labels.length ? '☑' : '☐'),
 						command: Commands.SWITCH_REF_SUGAR,
 						arguments: [document.uri],
 					},

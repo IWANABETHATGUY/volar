@@ -94,7 +94,7 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 			const scriptSetupGen = sourceFile.getScriptSetupData();
 			const scriptSetup = sourceFile.getDescriptor().scriptSetup;
 			if (scriptSetupGen && scriptSetup) {
-				const genData = scriptSetupGen.data;
+				const genData = scriptSetupGen;
 				for (const label of genData.labels) {
 					const labelPos = document.positionAt(scriptSetup.loc.start + label.label.start);
 					result.push([labelPos.line, labelPos.character, label.label.end - label.label.start + 1, tokenTypes.get('refLabel') ?? -1, undefined]);
@@ -133,7 +133,7 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 						const tsStart = sourceMap.targetDocument.offsetAt({ line: token[0], character: token[1] });
 						const tsEnd = sourceMap.targetDocument.offsetAt({ line: token[0], character: token[1] + token[2] });
 						const vueRange = sourceMap.targetToSource2({ start: tsStart, end: tsEnd });
-						if (!vueRange?.maped.data.capabilities.semanticTokens)
+						if (!vueRange?.data.capabilities.semanticTokens)
 							continue;
 						const vuePos = document.positionAt(vueRange.range.start);
 						result.push([vuePos.line, vuePos.character, vueRange.range.end - vueRange.range.start, token[3], token[4]]);

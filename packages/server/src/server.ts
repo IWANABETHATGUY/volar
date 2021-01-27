@@ -127,7 +127,7 @@ function initLanguageServiceApi(rootPath: string) {
 	connection.onRequest(FormatAllScriptsRequest.type, async options => {
 		const progress = await connection.window.createWorkDoneProgress();
 		progress.begin('Format', 0, '', true);
-		for (const [uri, service] of host.services) {
+		for (const [_, service] of host.services) {
 			const sourceFiles = service.languageService.getAllSourceFiles();
 			let i = 0;
 			for (const sourceFile of sourceFiles) {
@@ -269,7 +269,7 @@ function initLanguageServiceDoc(rootPath: string) {
 	connection.onRequest(WriteVirtualFilesRequest.type, async () => {
 		const progress = await connection.window.createWorkDoneProgress();
 		progress.begin('Write', 0, '', true);
-		for (const [uri, service] of host.services) {
+		for (const [_, service] of host.services) {
 			const globalDocs = service.languageService.getGlobalDocs();
 			for (const globalDoc of globalDocs) {
 				await fs.writeFile(uriToFsPath(globalDoc.uri), globalDoc.getText(), "utf8");
@@ -283,7 +283,7 @@ function initLanguageServiceDoc(rootPath: string) {
 					}
 					await fs.writeFile(uriToFsPath(uri), doc.getText(), "utf8");
 				}
-				progress.report(i++ / sourceFiles.length * 100, upath.relative(service.languageService.rootPath, sourceFile.fileName));
+				progress.report(i++ / sourceFiles.length * 100, upath.relative(service.languageService.rootPath, uriToFsPath(sourceFile.uri)));
 			}
 		}
 		progress.done();
@@ -291,7 +291,7 @@ function initLanguageServiceDoc(rootPath: string) {
 	connection.onRequest(VerifyAllScriptsRequest.type, async () => {
 		const progress = await connection.window.createWorkDoneProgress();
 		progress.begin('Verify', 0, '', true);
-		for (const [uri, service] of host.services) {
+		for (const [_, service] of host.services) {
 			const sourceFiles = service.languageService.getAllSourceFiles();
 			let i = 0;
 			for (const sourceFile of sourceFiles) {
@@ -302,7 +302,7 @@ function initLanguageServiceDoc(rootPath: string) {
 				await service.languageService.doValidation(doc, result => {
 					connection.sendDiagnostics({ uri: doc.uri, diagnostics: result });
 				});
-				progress.report(i++ / sourceFiles.length * 100, upath.relative(service.languageService.rootPath, sourceFile.fileName));
+				progress.report(i++ / sourceFiles.length * 100, upath.relative(service.languageService.rootPath, uriToFsPath(sourceFile.uri)));
 			}
 		}
 		progress.done();

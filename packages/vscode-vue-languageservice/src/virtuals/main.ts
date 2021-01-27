@@ -57,6 +57,7 @@ export function useScriptMain(
 			const sourceMap = new TsSourceMap(vueDoc, textDocument.value, false, { foldingRanges: false, formatting: false, documentSymbol: false });
 			sourceMap.add({
 				data: {
+					vueTag: 'script',
 					capabilities: {},
 				},
 				mode: MapedMode.In,

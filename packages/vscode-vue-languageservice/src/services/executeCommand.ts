@@ -32,18 +32,18 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 			const genData = sourceFile.getScriptSetupData();
 			if (!genData) return;
 			let edits: TextEdit[] = [];
-			if (genData.data.labels.length) {
+			if (genData.labels.length) {
 				// unuse ref sugar
 				let varsNum = 0;
 				let varsCur = 0;
-				for (const label of genData.data.labels) {
+				for (const label of genData.labels) {
 					for (const binary of label.binarys) {
 						varsNum += binary.vars.length;
 					}
 				}
 				const progress = await connection.window.createWorkDoneProgress();
 				progress.begin('Unuse Ref Sugar', 0, '', true);
-				for (const label of genData.data.labels) {
+				for (const label of genData.labels) {
 					edits.push(TextEdit.replace({
 						start: document.positionAt(desc.scriptSetup.loc.start + label.label.start),
 						end: document.positionAt(desc.scriptSetup.loc.start + label.label.end + 1),
@@ -101,7 +101,7 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 									const referenceText = document.getText().substring(refernceRange.start, refernceRange.end);
 									const isRaw = `$${varText}` === referenceText;
 									let isShorthand = false;
-									for (const shorthandProperty of genData.data.shorthandPropertys) {
+									for (const shorthandProperty of genData.shorthandPropertys) {
 										if (
 											refernceRange.start === desc.scriptSetup.loc.start + shorthandProperty.start
 											&& refernceRange.end === desc.scriptSetup.loc.start + shorthandProperty.end
@@ -149,12 +149,12 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 				// use ref sugar
 				let varsNum = 0;
 				let varsCur = 0;
-				for (const label of genData.data.refCalls) {
+				for (const label of genData.refCalls) {
 					varsNum += label.vars.length;
 				}
 				const progress = await connection.window.createWorkDoneProgress();
 				progress.begin('Use Ref Sugar', 0, '', true);
-				for (const refCall of genData.data.refCalls) {
+				for (const refCall of genData.refCalls) {
 					const left = document.getText().substring(
 						desc.scriptSetup.loc.start + refCall.left.start,
 						desc.scriptSetup.loc.start + refCall.left.end,

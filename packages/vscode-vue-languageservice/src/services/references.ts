@@ -12,14 +12,14 @@ import {
 } from '../utils/commons';
 import type * as ts2 from '@volar/vscode-typescript-languageservice';
 import * as globalServices from '../globalServices';
-import { SourceMap, TsSourceMap } from '../utils/sourceMaps';
+import { TsMappingData, TsSourceMap } from '../utils/sourceMaps';
 
 export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService: ts2.LanguageService, getGlobalTsSourceMaps?: () => Map<string, { sourceMap: TsSourceMap }>) {
 	return (document: TextDocument, position: Position, ingoreTsResult = false) => {
 		const range = { start: position, end: position };
 
 		if (document.languageId !== 'vue') {
-			let result = getTsResultWorker(document, range);
+			let result = getTsResultWorker(document, range, 'script');
 			if (ingoreTsResult) {
 				result = result.filter(loc => sourceFiles.has(loc.uri)); // duplicate
 			}
@@ -38,43 +38,35 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 			let result: Location[] = [];
 			for (const sourceMap of sourceFile.getTsSourceMaps()) {
 				for (const tsLoc of sourceMap.sourceToTargets(range)) {
-					if (!tsLoc.maped.data.capabilities.references) continue;
-					result = result.concat(getTsResultWorker(sourceMap.targetDocument, tsLoc.range));
+					if (!tsLoc.data.capabilities.references) continue;
+					result = result.concat(getTsResultWorker(sourceMap.targetDocument, tsLoc.range, tsLoc.data.vueTag));
 				}
 			}
 			return result;
 		}
-		function getTsResultWorker(tsDoc: TextDocument, tsRange: Range) {
+		function getTsResultWorker(tsDoc: TextDocument, tsRange: Range, from: TsMappingData['vueTag']) {
 			const tsLocations: Location[] = [];
-			worker(tsDoc, tsRange.start);
+			worker(tsDoc, tsRange.start, from);
 			const globalTsSourceMaps = getGlobalTsSourceMaps?.();
 			return tsLocations.map(tsLoc => tsLocationToVueLocations(tsLoc, sourceFiles, globalTsSourceMaps)).flat();
 
-			function worker(doc: TextDocument, pos: Position) {
+			function worker(doc: TextDocument, pos: Position, from: TsMappingData['vueTag']) {
 				const references = tsLanguageService.findReferences(doc.uri, pos);
 				for (const reference of references) {
+
 					if (hasLocation(reference)) continue;
 					tsLocations.push(reference);
+
 					const sourceFile_2 = findSourceFileByTsUri(sourceFiles, reference.uri);
-					const tsm = sourceFile_2?.getMirrorsSourceMaps();
-					if (tsm?.contextSourceMap?.sourceDocument.uri === reference.uri)
-						transfer(tsm.contextSourceMap);
-					if (tsm?.scriptSetupSourceMap?.sourceDocument.uri === reference.uri)
-						transfer(tsm.scriptSetupSourceMap);
-					function transfer(sourceMap: SourceMap) {
-						const leftRange = sourceMap.isSource(reference.range)
-							? reference.range
-							: sourceMap.targetToSource(reference.range)?.range;
-						if (leftRange) {
-							const leftLoc = { uri: sourceMap.sourceDocument.uri, range: leftRange };
-							if (!hasLocation(leftLoc)) {
-								worker(sourceMap.sourceDocument, leftLoc.range.start);
-							}
-							const rightLocs = sourceMap.sourceToTargets(leftRange);
-							for (const rightLoc of rightLocs) {
-								const rightLoc_2 = { uri: sourceMap.sourceDocument.uri, range: rightLoc.range };
-								if (!hasLocation(rightLoc_2)) {
-									worker(sourceMap.sourceDocument, rightLoc_2.range.start);
+					if (!sourceFile_2) continue;
+
+					const teleports = sourceFile_2.getTeleports();
+					for (const teleport of teleports) {
+						if (teleport.document.uri === reference.uri) {
+							for (const loc of teleport.findTeleports(reference.range, from)) {
+								if (!loc.data.capabilities.references) continue;
+								if (!hasLocation({ uri: reference.uri, range: loc.range })) {
+									worker(teleport.document, loc.range.start, from);
 								}
 							}
 						}

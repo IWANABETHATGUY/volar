@@ -129,7 +129,7 @@ export function register(sourceFiles: Map<string, SourceFile>, vueHost: ts.Langu
 			const result: DocumentLink[] = [];
 			for (const sourceMap of sourceFile.getTsSourceMaps()) {
 				for (const maped of sourceMap) {
-					if (!maped.data.showLink) {
+					if (!maped.data.capabilities.displayWithLink) {
 						continue;
 					}
 					result.push({

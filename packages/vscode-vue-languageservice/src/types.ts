@@ -49,6 +49,5 @@ export interface ITemplateScriptData {
 	components: string[];
 	props: string[];
 	setupReturns: string[];
-	scriptSetupExports: string[];
 	htmlElements: string[];
 }

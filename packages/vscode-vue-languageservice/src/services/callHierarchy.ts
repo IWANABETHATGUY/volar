@@ -17,7 +17,7 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 		let vueItems: CallHierarchyItem[] = [];
 
 		if (document.languageId !== 'vue') {
-			const items = worker(document, position);
+			const items = worker(document.uri, position);
 			vueItems = vueItems.concat(items);
 		}
 		else {
@@ -25,8 +25,8 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 			if (sourceFile) {
 				for (const sourceMap of sourceFile.getTsSourceMaps()) {
 					for (const tsLoc of sourceMap.sourceToTargets({ start: position, end: position })) {
-						if (!tsLoc.maped.data.capabilities.references) continue;
-						const items = worker(sourceMap.targetDocument, tsLoc.range.start);
+						if (!tsLoc.data.capabilities.references) continue;
+						const items = worker(sourceMap.targetDocument.uri, tsLoc.range.start);
 						vueItems = vueItems.concat(items);
 					}
 				}
@@ -79,9 +79,9 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 		provideCallHierarchyOutgoingCalls,
 	}
 
-	function worker(tsDoc: TextDocument, tsPos: Position) {
+	function worker(tsDocUri: string, tsPos: Position) {
 		const vueOrTsItems: CallHierarchyItem[] = [];
-		const tsItems = tsLanguageService.prepareCallHierarchy(tsDoc.uri, tsPos);
+		const tsItems = tsLanguageService.prepareCallHierarchy(tsDocUri, tsPos);
 		for (const tsItem of tsItems) {
 			const result = toVueCallHierarchyItem(tsItem, []);
 			if (!result) continue;
@@ -141,7 +141,7 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 				const tsSelectionLocs = sourceMap.sourceToTargets(item.selectionRange);
 				if (tsLocs.length) {
 					for (const tsLoc of tsLocs) {
-						if (!tsLoc.maped.data.capabilities.references) continue;
+						if (!tsLoc.data.capabilities.references) continue;
 						for (const tsSelectionLoc of tsSelectionLocs) {
 							tsItems.push({
 								...item,

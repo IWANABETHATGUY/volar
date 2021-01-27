@@ -192,6 +192,7 @@ export function createLanguageService(vueHost: ts.LanguageServiceHost, onUpdate?
 				const _end = docLength + addText.length;
 				mappings.push({
 					data: {
+						vueTag: 'script',
 						capabilities: {
 							references: true,
 							referencesCodeLens: true,
@@ -356,7 +357,7 @@ export function createLanguageService(vueHost: ts.LanguageServiceHost, onUpdate?
 			getScriptSnapshot,
 			readDirectory: (path, extensions, exclude, include, depth) => {
 				const result = ts.sys.readDirectory(path, extensions, exclude, include, depth);
-				for (const [uri, sourceFile] of sourceFiles) {
+				for (const [uri] of sourceFiles) {
 					const vuePath = uriToFsPath(uri);
 					const vuePath2 = upath.join(path, upath.basename(vuePath));
 					if (upath.relative(path.toLowerCase(), vuePath.toLowerCase()).startsWith('..')) {

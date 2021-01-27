@@ -178,7 +178,7 @@ export function register() {
 				const textEdits = cheapTs.service.doFormatting(cheapTs.uri, options);
 				for (const textEdit of textEdits) {
 					for (const vueLoc of sourceMap.targetToSources(textEdit.range)) {
-						if (!vueLoc.maped.data.capabilities.formatting) continue;
+						if (!vueLoc.data.capabilities.formatting) continue;
 						result.push({
 							newText: textEdit.newText,
 							range: vueLoc.range,
