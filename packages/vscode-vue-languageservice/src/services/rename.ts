@@ -1,3 +1,4 @@
+import type { TsApiRegisterOptions } from '../types';
 import {
 	Position,
 	WorkspaceEdit,
@@ -12,9 +13,8 @@ import { TextDocument } from 'vscode-languageserver-textdocument';
 import { SourceFile } from '../sourceFiles';
 import { TsMappingData } from '../utils/sourceMaps';
 import * as globalServices from '../globalServices';
-import type * as ts2 from '@volar/vscode-typescript-languageservice';
 
-export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService: ts2.LanguageService) {
+export function register({ sourceFiles, tsLanguageService }: TsApiRegisterOptions) {
 	return (document: TextDocument, position: Position, newName: string) => {
 		const sourceFile = sourceFiles.get(document.uri);
 		if (!sourceFile) return;

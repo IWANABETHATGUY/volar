@@ -1,18 +1,18 @@
+import type { TsApiRegisterOptions } from '../types';
 import {
 	Range,
-	TextDocument,
 	DocumentLink,
 } from 'vscode-languageserver/node';
 import { SourceFile } from '../sourceFiles';
 import * as jsonc from 'jsonc-parser';
 import { uriToFsPath, fsPathToUri } from '@volar/shared';
 import * as upath from 'upath';
-import type * as ts from 'typescript';
 import { notEmpty } from '@volar/shared';
 import * as globalServices from '../globalServices';
 import { getTypescript } from '@volar/vscode-builtin-packages';
+import { TextDocument } from 'vscode-languageserver-textdocument';
 
-export function register(sourceFiles: Map<string, SourceFile>, vueHost: ts.LanguageServiceHost) {
+export function register({ sourceFiles, vueHost }: TsApiRegisterOptions) {
 	const ts = getTypescript();
 	return (document: TextDocument) => {
 		const sourceFile = sourceFiles.get(document.uri);

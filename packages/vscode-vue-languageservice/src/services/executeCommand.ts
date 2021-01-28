@@ -1,19 +1,18 @@
+import type { TsApiRegisterOptions } from '../types';
 import {
 	Range,
 	TextEdit,
 	Connection,
 } from 'vscode-languageserver/node';
-import { SourceFile } from '../sourceFiles';
 import { Commands } from '../commands';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
 import { pugToHtml, htmlToPug } from '@volar/pug';
 import { ShowReferencesNotification, sleep } from '@volar/shared';
-import type * as ts2 from '@volar/vscode-typescript-languageservice';
 import { SearchTexts } from '../virtuals/common';
 import * as findReferences from './references';
 
-export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService: ts2.LanguageService) {
-	const _findReferences = findReferences.register(sourceFiles, tsLanguageService);
+export function register({ sourceFiles, tsLanguageService }: TsApiRegisterOptions) {
+	const _findReferences = findReferences.register(arguments[0]);
 	return async (document: TextDocument, command: string, args: any[] | undefined, connection: Connection) => {
 
 		if (command === Commands.SHOW_REFERENCES && args) {

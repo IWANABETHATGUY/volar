@@ -1,3 +1,4 @@
+import type { TsApiRegisterOptions } from '../types';
 import {
 	Position,
 	Range,
@@ -6,14 +7,12 @@ import {
 	CallHierarchyOutgoingCall,
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { SourceFile } from '../sourceFiles';
-import type * as ts2 from '@volar/vscode-typescript-languageservice';
 import { notEmpty, uriToFsPath } from '@volar/shared';
 import * as upath from 'upath';
 import * as dedupe from '../utils/dedupe';
 
-export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService: ts2.LanguageService) {
-	function prepareCallHierarchy(document: TextDocument, position: Position) {
+export function register({ sourceFiles, tsLanguageService }: TsApiRegisterOptions) {
+	function onPrepare(document: TextDocument, position: Position) {
 		let vueItems: CallHierarchyItem[] = [];
 
 		if (document.languageId !== 'vue') {
@@ -41,7 +40,7 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 
 		return dedupe.withLocations(vueItems);
 	}
-	function provideCallHierarchyIncomingCalls(item: CallHierarchyItem) {
+	function onIncomingCalls(item: CallHierarchyItem) {
 		const tsItems = tsTsCallHierarchyItem(item);
 		const tsIncomingItems = tsItems.map(tsLanguageService.provideCallHierarchyIncomingCalls).flat();
 		const vueIncomingItems: CallHierarchyIncomingCall[] = [];
@@ -56,7 +55,7 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 		}
 		return dedupe.withCallHierarchyIncomingCalls(vueIncomingItems);
 	}
-	function provideCallHierarchyOutgoingCalls(item: CallHierarchyItem) {
+	function onOutgoingCalls(item: CallHierarchyItem) {
 		const tsItems = tsTsCallHierarchyItem(item);
 		const tsIncomingItems = tsItems.map(tsLanguageService.provideCallHierarchyOutgoingCalls).flat();
 		const vueIncomingItems: CallHierarchyOutgoingCall[] = [];
@@ -73,9 +72,9 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 	}
 
 	return {
-		prepareCallHierarchy,
-		provideCallHierarchyIncomingCalls,
-		provideCallHierarchyOutgoingCalls,
+		onPrepare,
+		onIncomingCalls,
+		onOutgoingCalls,
 	}
 
 	function worker(tsDocUri: string, tsPos: Position) {

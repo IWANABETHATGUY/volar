@@ -1,5 +1,5 @@
+import type { TsApiRegisterOptions } from '../types';
 import {
-	TextDocument,
 	SymbolInformation,
 	SymbolKind,
 	Location,
@@ -7,10 +7,10 @@ import {
 } from 'vscode-languageserver/node';
 import { SourceFile } from '../sourceFiles';
 import * as globalServices from '../globalServices';
-import type * as ts2 from '@volar/vscode-typescript-languageservice';
 import { notEmpty } from '@volar/shared';
+import type { TextDocument } from 'vscode-languageserver-textdocument';
 
-export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService: ts2.LanguageService) {
+export function register({ sourceFiles, tsLanguageService }: TsApiRegisterOptions) {
 	return (document: TextDocument) => {
 		const sourceFile = sourceFiles.get(document.uri);
 		if (!sourceFile) return;

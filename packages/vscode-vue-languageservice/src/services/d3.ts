@@ -1,20 +1,19 @@
+import type { TsApiRegisterOptions } from '../types';
 import {
 	Range,
 	Location,
 } from 'vscode-languageserver/node';
-import { SourceFile } from '../sourceFiles';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
-import type * as ts2 from '@volar/vscode-typescript-languageservice';
 import * as references from './references';
 import * as definitions from './definitions';
 import type * as ts from 'typescript';
 import { getTypescript } from '@volar/vscode-builtin-packages';
 
-export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService: ts2.LanguageService) {
+export function register({ sourceFiles, tsLanguageService }: TsApiRegisterOptions) {
 
 	const ts = getTypescript();
-	const findReferences = references.register(sourceFiles, tsLanguageService);
-	const findDefinitions = definitions.register(sourceFiles, tsLanguageService);
+	const findReferences = references.register(arguments[0]);
+	const findDefinition = definitions.register(arguments[0]);
 
 	return async (document: TextDocument) => {
 
@@ -192,7 +191,7 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 								funcCalls.push({
 									name: sourceMap.sourceDocument.getText(loc.range),
 									range: loc.range,
-									definitions: findDefinitions(sourceMap.sourceDocument, loc.range.start),
+									definitions: findDefinition(sourceMap.sourceDocument, loc.range.start),
 								});
 							}
 						}
@@ -333,7 +332,7 @@ export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService
 							funcCalls.push({
 								name: tsDoc.getText(loc),
 								range: loc,
-								definitions: findDefinitions(tsDoc, loc.start),
+								definitions: findDefinition(tsDoc, loc.start),
 							});
 						}
 					}

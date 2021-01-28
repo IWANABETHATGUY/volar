@@ -1,3 +1,4 @@
+import type { TsApiRegisterOptions } from '../types';
 import { CancellationToken, Range, ResultProgressReporter, SemanticTokensBuilder, SemanticTokensLegend, SemanticTokensPartialResult } from 'vscode-languageserver/node';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
 import type { SourceFile } from '../sourceFiles';
@@ -24,7 +25,7 @@ export const semanticTokenLegend: SemanticTokensLegend = {
 	tokenModifiers: tsLegend.modifiers,
 };
 
-export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService: ts2.LanguageService) {
+export function register({ sourceFiles, tsLanguageService }: TsApiRegisterOptions) {
 	return (document: TextDocument, range?: Range, cancle?: CancellationToken, resultProgress?: ResultProgressReporter<SemanticTokensPartialResult>) => {
 		const sourceFile = sourceFiles.get(document.uri);
 		if (!sourceFile) return;

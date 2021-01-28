@@ -1,3 +1,4 @@
+import type { TsApiRegisterOptions } from '../types';
 import {
 	Position,
 	CompletionItem,
@@ -18,7 +19,6 @@ import * as globalServices from '../globalServices';
 import * as emmet from 'vscode-emmet-helper';
 import * as getEmbeddedDocument from './embeddedDocument';
 import type * as ts from 'typescript';
-import type * as ts2 from '@volar/vscode-typescript-languageservice';
 
 export const triggerCharacter = {
 	typescript: [".", "\"", "'", "`", "/", "@", "<", "#"],
@@ -31,8 +31,8 @@ export const wordPatterns: { [lang: string]: RegExp } = {
 	scss: /(#?-?\d*\.\d\w*%?)|(::?[\w-]*(?=[^,{;]*[,{]))|(([@$#.!])?[\w-?]+%?|[@#!$.])/g,
 };
 
-export function register(sourceFiles: Map<string, SourceFile>, tsLanguageService: ts2.LanguageService) {
-	const getEmbeddedDoc = getEmbeddedDocument.register(sourceFiles);
+export function register({ sourceFiles, tsLanguageService }: TsApiRegisterOptions) {
+	const getEmbeddedDoc = getEmbeddedDocument.register(arguments[0]);
 
 	return async (document: TextDocument, position: Position, context?: CompletionContext, getEmmetConfig?: (syntax: string) => Promise<emmet.VSCodeEmmetConfig>) => {
 		const sourceFile = sourceFiles.get(document.uri);

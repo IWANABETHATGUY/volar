@@ -1,7 +1,6 @@
 import type * as ts from 'typescript';
 import {
 	Hover,
-	TextDocument,
 	MarkupContent,
 	MarkupKind,
 	Range,
@@ -10,6 +9,7 @@ import {
 import * as previewer from '../utils/previewer';
 import { uriToFsPath } from '@volar/shared';
 import { getTypescript } from '@volar/vscode-builtin-packages';
+import type { TextDocument } from 'vscode-languageserver-textdocument';
 
 export function register(languageService: ts.LanguageService, getTextDocument: (uri: string) => TextDocument | undefined) {
 	const ts = getTypescript();

@@ -227,31 +227,31 @@ function initLanguageServiceApi(rootPath: string) {
 	connection.onReferences(handler => {
 		const document = documents.get(handler.textDocument.uri);
 		if (!document) return undefined;
-		return host.all(document.uri).map(ls => ls.findReferences(document, handler.position, true)).flat();
+		return host.all(document.uri).map(ls => ls.findReferences(document, handler.position)).flat();
 	});
 	connection.onDefinition(handler => {
 		const document = documents.get(handler.textDocument.uri);
 		if (!document) return undefined;
-		return host.best(document.uri)?.findDefinition(document, handler.position, true);
+		return host.best(document.uri)?.findDefinition(document, handler.position);
 	});
 	connection.onTypeDefinition(handler => {
 		const document = documents.get(handler.textDocument.uri);
 		if (!document) return undefined;
-		return host.best(document.uri)?.findTypeDefinition(document, handler.position, true);
+		return host.best(document.uri)?.findTypeDefinition(document, handler.position);
 	});
 	connection.languages.callHierarchy.onPrepare(handler => {
 		const document = documents.get(handler.textDocument.uri);
 		if (!document) return [];
-		const items = host.best(document.uri)?.prepareCallHierarchy(document, handler.position);
+		const items = host.best(document.uri)?.callHierarchy.onPrepare(document, handler.position);
 		return items?.length ? items : null;
 	});
 	connection.languages.callHierarchy.onIncomingCalls(handler => {
 		const { uri } = handler.item.data as { uri: string };
-		return host.best(uri)?.provideCallHierarchyIncomingCalls(handler.item) ?? [];
+		return host.best(uri)?.callHierarchy.onIncomingCalls(handler.item) ?? [];
 	});
 	connection.languages.callHierarchy.onOutgoingCalls(handler => {
 		const { uri } = handler.item.data as { uri: string };
-		return host.best(uri)?.provideCallHierarchyOutgoingCalls(handler.item) ?? [];
+		return host.best(uri)?.callHierarchy.onOutgoingCalls(handler.item) ?? [];
 	});
 }
 function initLanguageServiceDoc(rootPath: string) {

@@ -1,12 +1,12 @@
 import type * as ts from 'typescript';
 import {
-	TextDocument,
 	DocumentHighlight,
 	DocumentHighlightKind,
 	Position,
 } from 'vscode-languageserver/node';
 import { uriToFsPath } from '@volar/shared';
 import { getTypescript } from '@volar/vscode-builtin-packages';
+import type { TextDocument } from 'vscode-languageserver-textdocument';
 
 export function register(languageService: ts.LanguageService, getTextDocument: (uri: string) => TextDocument | undefined) {
 	const ts = getTypescript();

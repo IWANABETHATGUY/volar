@@ -1,5 +1,5 @@
+import type { TsApiRegisterOptions } from '../types';
 import {
-	TextDocument,
 	ColorPresentation,
 	Color,
 	Range,
@@ -7,8 +7,9 @@ import {
 } from 'vscode-languageserver/node';
 import { SourceFile } from '../sourceFiles';
 import * as globalServices from '../globalServices';
+import type { TextDocument } from 'vscode-languageserver-textdocument';
 
-export function register(sourceFiles: Map<string, SourceFile>) {
+export function register({ sourceFiles }: TsApiRegisterOptions) {
 	return (document: TextDocument, color: Color, range: Range) => {
 		const sourceFile = sourceFiles.get(document.uri);
 		if (!sourceFile) return;

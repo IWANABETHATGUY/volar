@@ -1,3 +1,4 @@
+import type { TsApiRegisterOptions } from '../types';
 import {
 	CodeLens,
 	Range,
@@ -5,9 +6,8 @@ import {
 import { SourceFile } from '../sourceFiles';
 import { Commands } from '../commands';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
-import { TsSourceMap } from '../utils/sourceMaps';
 
-export function register(sourceFiles: Map<string, SourceFile>, getGlobalTsSourceMaps: () => Map<string, { sourceMap: TsSourceMap }>) {
+export function register({ sourceFiles, getGlobalTsSourceMaps }: TsApiRegisterOptions) {
 	return (document: TextDocument) => {
 
 		const globalTsSourceMaps = getGlobalTsSourceMaps?.();
