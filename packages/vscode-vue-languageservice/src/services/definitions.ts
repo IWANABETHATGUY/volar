@@ -21,8 +21,10 @@ export function register({ sourceFiles, tsLanguageService, getGlobalTsSourceMaps
 
 		const sourceFile = sourceFiles.get(document.uri);
 		if (!sourceFile) {
-			return onTs(document, position, 'script', tsLanguageService.findDefinition)
-				.filter(loc => sourceFiles.has(loc.uri)); // dedupe
+			return dedupe.withLocations(
+				onTs(document, position, 'script', tsLanguageService.findDefinition)
+					.filter(loc => sourceFiles.has(loc.uri)) // dedupe
+			);
 		}
 
 		return dedupe.withLocations([

@@ -25,6 +25,7 @@ export function register({ sourceFiles, tsLanguageService, getGlobalTsSourceMaps
 			...onVueCss(sourceFile, position),
 		]);
 	}
+	// vue locs -> ts locs
 	function onVueTs(sourceFile: SourceFile, position: Position) {
 		let result: Location[] = [];
 		for (const sourceMap of sourceFile.getTsSourceMaps()) {
@@ -35,11 +36,11 @@ export function register({ sourceFiles, tsLanguageService, getGlobalTsSourceMaps
 		}
 		return result;
 	}
+	// ts loc -> find references -> vue locs
 	function onTs(tsDoc: TextDocument, tsPos: Position, from: TsMappingData['vueTag'] = 'script') {
 		const tsLocs: Location[] = [];
 		worker(tsDoc, tsPos, from);
-		const globalTsSourceMaps = getGlobalTsSourceMaps?.();
-		return tsLocs.map(tsLoc => tsLocationToVueLocations(tsLoc, sourceFiles, globalTsSourceMaps)).flat();
+		return tsLocs.map(tsLoc => tsLocationToVueLocations(tsLoc, sourceFiles, getGlobalTsSourceMaps?.())).flat();
 
 		function worker(doc: TextDocument, pos: Position, from: TsMappingData['vueTag']) {
 			const references = tsLanguageService.findReferences(doc.uri, pos);
@@ -75,6 +76,7 @@ export function register({ sourceFiles, tsLanguageService, getGlobalTsSourceMaps
 			)
 		}
 	}
+	// vue locs -> css locs -> find refernces -> vue locs
 	function onVueCss(sourceFile: SourceFile, position: Position) {
 		let result: Location[] = [];
 		for (const sourceMap of sourceFile.getCssSourceMaps()) {
